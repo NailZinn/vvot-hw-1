@@ -1,7 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using Function.Types;
-using Microsoft.Net.Http.Headers;
 using Telegram.Bot;
 
 namespace Function;
@@ -21,7 +20,7 @@ public static class Helpers
         var httpResponse = await Utils.SendHttpRequestToYandexService(
             HttpMethod.Post,
             "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
-            [(HeaderNames.ContentType, "application/json")],
+            [("Content-Type", "application/json")],
             JsonSerializer.Serialize(payload, Utils.CamelCaseOptions)
         );
 
@@ -42,7 +41,7 @@ public static class Helpers
             .GetString() ?? "Я не смог подготовить ответ на экзаменационный вопрос.";
     }
 
-    public static async Task<string?> GetTextFromImage(string fileId, TelegramBotClient bot)
+    public static async Task<string?> GetTextFromImageAsync(string fileId, TelegramBotClient bot)
     {
         await using var stream = File.Create("./file.temp");
         var file = await bot.GetInfoAndDownloadFile(fileId, stream);

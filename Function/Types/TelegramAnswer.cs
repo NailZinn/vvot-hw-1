@@ -1,10 +1,8 @@
 namespace Function.Types;
 
-public class TelegramAnswer
+public class TelegramAnswer(long chatId, string text)
 {
-    public string Method { get; set; } = default!;
+    public long ChatId { get; set; } = chatId;
 
-    public long ChatId { get; set; }
-
-    public string Text { get; set; } = default!;
+    public string Text { get; set; } = text;
 }
