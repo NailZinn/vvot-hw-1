@@ -54,7 +54,7 @@ data "archive_file" "source" {
 }
 
 resource "yandex_function" "function" {
-  name              = "hw-1"
+  name              = "hw-1-qwmntb"
   user_hash         = data.archive_file.source.output_md5
   runtime           = "dotnet8"
   memory            = 128
