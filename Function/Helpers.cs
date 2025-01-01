@@ -1,7 +1,5 @@
-using System.Net.Http.Json;
 using System.Text.Json;
 using Function.Types;
-using Telegram.Bot;
 
 namespace Function;
 
@@ -42,20 +40,19 @@ public static class Helpers
             .GetString() ?? "Я не смог подготовить ответ на экзаменационный вопрос.";
     }
 
-    public static async Task<string?> GetTextFromImageAsync(string fileId, TelegramBotClient bot)
+    public static async Task<string?> GetTextFromImageAsync(string fileId)
     {
-        await using var stream = File.Create("./file.temp");
-        var file = await bot.GetInfoAndDownloadFile(fileId, stream);
+        var filePath = await Utils.GetFilePathAsync(fileId);
 
-        Console.WriteLine(file.FilePath);
+        if (filePath is null) return null;
 
-        var memory = new MemoryStream();
-        stream.CopyTo(memory);
+        var bytes = await Utils.DownloadFileAsync(filePath);
 
-        var bytes = memory.ToArray();
+        if (bytes.Length == 0) return null;
+
         var imageAsString = Convert.ToBase64String(bytes);
 
-        var payload = new OcrRequest(file.FilePath!.Split('.')[^1], ["*"], imageAsString);
+        var payload = new OcrRequest(filePath.Split('.')[^1], ["*"], imageAsString);
 
         var httpResponse = await Utils.SendHttpRequestToYandexService(
             HttpMethod.Post,
@@ -64,14 +61,14 @@ public static class Helpers
             JsonSerializer.Serialize(payload, Utils.CamelCaseOptions)
         );
 
-        if (!httpResponse.IsSuccessStatusCode)
-        {
-            return null;
-        }
+        if (!httpResponse.IsSuccessStatusCode) return null;
 
-        var data = await httpResponse.Content.ReadFromJsonAsync<JsonElement>();
+        var dataAsString = await httpResponse.Content.ReadAsStringAsync();
+        var data = JsonSerializer.Deserialize<JsonElement>(dataAsString);
 
         return data
+            .GetProperty("result")
+            .GetProperty("textAnnotation")
             .GetProperty("fullText")
             .GetString();
     }

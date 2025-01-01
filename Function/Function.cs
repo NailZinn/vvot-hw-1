@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using Function.Types;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -8,8 +7,6 @@ namespace Function;
 
 public class Handler
 {
-    private readonly TelegramBotClient _bot = new TelegramBotClient(Utils.TgBotToken);
-
     public async Task<Response> FunctionHandler(Request request)
     {
         var body = request.body.Replace("\n", "");
@@ -21,7 +18,7 @@ public class Handler
 
         if (update is null || update.Message is null)
         {
-            return new Response(400, "Некорректный запрос.");
+            return new Response(200, "Некорректный запрос.");
         }
 
         Console.WriteLine($"Message Type is {update.Message.Type}");
@@ -29,7 +26,7 @@ public class Handler
         if (update.Message.Type is not MessageType.Text and not MessageType.Photo)
         {
             await Utils.SendMessageAsync(update.Message.Chat.Id, "Я могу обработать только текстовое сообщение или фотографию.");
-            return new Response(400, "Некорректный запрос");
+            return new Response(200, "Некорректный запрос");
         }
 
         var textMessage = "";
@@ -39,11 +36,11 @@ public class Handler
         }
         else if (update.Message.Type == MessageType.Photo)
         {
-            var textFromImage = await Helpers.GetTextFromImageAsync(update.Message.Photo![^1].FileId, _bot);
-            if (textFromImage is null)
+            textMessage = await Helpers.GetTextFromImageAsync(update.Message.Photo![^1].FileId);
+            if (textMessage is null)
             {
                 await Utils.SendMessageAsync(update.Message.Chat.Id, "Я не могу обработать эту фотографию.");
-                return new Response(400, "Некорректный запрос");
+                return new Response(200, "Некорректный запрос");
             }
         }
 
