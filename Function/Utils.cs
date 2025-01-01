@@ -21,6 +21,10 @@ public static class Utils
 
     public static readonly string TgBotToken = Environment.GetEnvironmentVariable("TG_BOT_TOKEN")!;
 
+    public static readonly string MountPoint = Environment.GetEnvironmentVariable("MOUNT_POINT")!;
+
+    public static readonly string GptContextFileName = Environment.GetEnvironmentVariable("GPT_CONTEXT_FILE_NAME")!;
+
     private static readonly string TgBotUrlFormat = $"https://api.telegram.org{{0}}/bot{TgBotToken}{{1}}";
 
     public static async Task<HttpResponseMessage> SendHttpRequestToYandexService(

@@ -4,7 +4,7 @@ terraform {
       source = "yandex-cloud/yandex"
     }
     telegram = {
-      source = "yi-jiayu/telegram"
+      source  = "yi-jiayu/telegram"
       version = "0.3.1"
     }
   }
@@ -61,9 +61,11 @@ resource "yandex_function" "function" {
   entrypoint        = "Function.Handler"
   execution_timeout = "10"
   environment = {
-    "FOLDER_ID"    = var.folder_id
-    "IAM_TOKEN"    = var.iam_token
-    "TG_BOT_TOKEN" = var.tg_bot_key
+    "FOLDER_ID"             = var.folder_id
+    "IAM_TOKEN"             = var.iam_token
+    "TG_BOT_TOKEN"          = var.tg_bot_key
+    "MOUNT_POINT"           = "gpt-settings"
+    "GPT_CONTEXT_FILE_NAME" = "context.txt"
   }
   service_account_id = yandex_iam_service_account.sa_bucket.id
   mounts {
@@ -80,7 +82,7 @@ resource "yandex_function" "function" {
 
 resource "yandex_function_iam_binding" "function_invoker" {
   function_id = yandex_function.function.id
-  role = "functions.functionInvoker"
+  role        = "functions.functionInvoker"
   members = [
     "system:allUsers"
   ]
@@ -99,11 +101,11 @@ variable "folder_id" {
 }
 
 variable "tg_bot_key" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "iam_token" {
-  type = string
+  type      = string
   sensitive = true
 }

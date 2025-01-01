@@ -7,7 +7,7 @@ public static class Helpers
 {
     public static async Task<string> SendGptPromptAsync(string text)
     {
-        var context = await File.ReadAllTextAsync("/function/storage/gpt-settings/context.txt");
+        var context = await File.ReadAllTextAsync($"/function/storage/{Utils.MountPoint}/{Utils.GptContextFileName}");
         var payload = new GptRequest
         {
             ModelUri = $"gpt://{Utils.FolderId}/yandexgpt-lite",
