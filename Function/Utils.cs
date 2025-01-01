@@ -53,11 +53,7 @@ public static class Utils
             ["text"] = text
         });
 
-        Console.WriteLine(await httpRequest.Content.ReadAsStringAsync());
-
         var httpResponse = await httpClient.SendAsync(httpRequest);
-        Console.WriteLine(httpResponse.StatusCode);
-        Console.WriteLine(await httpResponse.Content.ReadAsStringAsync());
     }
 
     public static async Task<string?> GetFilePathAsync(string fileId)
