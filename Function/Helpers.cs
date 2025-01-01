@@ -12,7 +12,7 @@ public static class Helpers
         var context = await File.ReadAllTextAsync("/function/storage/gpt-settings/context.txt");
         var payload = new GptRequest
         {
-            ModelUri = $"gpt:{Utils.FolderId}/yandexgpt-lite",
+            ModelUri = $"gpt://{Utils.FolderId}/yandexgpt-lite",
             CompletionOptions = new CompletionOptions(false, 0.6, "2000"),
             Messages = [new Message("system", context), new Message("user", text)]
         };
@@ -20,7 +20,7 @@ public static class Helpers
         var httpResponse = await Utils.SendHttpRequestToYandexService(
             HttpMethod.Post,
             "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
-            [("Content-Type", "application/json")],
+            [],
             JsonSerializer.Serialize(payload, Utils.CamelCaseOptions)
         );
 
@@ -29,7 +29,8 @@ public static class Helpers
             return "Я не смог подготовить ответ на экзаменационный вопрос.";
         }
 
-        var data = await httpResponse.Content.ReadFromJsonAsync<JsonElement>();
+        var dataAsString = await httpResponse.Content.ReadAsStringAsync();
+        var data = JsonSerializer.Deserialize<JsonElement>(dataAsString);
 
         return data
             .GetProperty("result")
